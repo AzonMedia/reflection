@@ -67,4 +67,52 @@ class ReflectionClass extends \ReflectionClass
         }
         return $ret;
     }
+
+    /**
+     * Will return TRUE only if the class has the $name property and it is static.
+     * @param string $name
+     * @return bool
+     */
+    public function hasStaticProperty(string $name) : bool
+    {
+        $static_properties = $this->getStaticProperties();
+        $ret = array_key_exists($name, $static_properties);
+        return $ret;
+    }
+
+    public function hasOwnDynamicProperty(string $name) : bool
+    {
+        $ret = FALSE;
+        if ($this->hasProperty($name)) {
+            $RProperty = $this->getProperty($name);
+            if (!$RProperty->isStatic() && $RProperty->class === $this->name) {
+                $ret = TRUE;
+            }
+        }
+        return $ret;
+    }
+
+    public function hasOwnStaticProperty(string $name) : bool
+    {
+        $ret = FALSE;
+        if ($this->hasProperty($name)) {
+            $RProperty = $this->getProperty($name);
+            if ($RProperty->isStatic() && $RProperty->class === $this->name) {
+                $ret = TRUE;
+            }
+        }
+        return $ret;
+    }
+
+    public function hasOwnConstant(string $name) : bool
+    {
+        $ret = FALSE;
+        if ($this->hasConstant($name)) {
+            $RClassConstant = new \ReflectionClassConstant($this->name, $name);
+            if ($RClassConstant->class === $this->name) {
+                $ret = TRUE;
+            }
+        }
+        return $ret;
+    }
 }
