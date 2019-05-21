@@ -6,12 +6,14 @@ namespace Azonmedia\Reflection;
 
 /**
  * Class ReflectionClass
+ * Contains additional methods to the ones provided in \ReflectionClass
  * @package Reflection
  *
  */
 class ReflectionClass extends \ReflectionClass
 {
     /**
+     * Returns an array of all parent classes
      * @return array
      */
     public function getParentClasses() : array
@@ -63,7 +65,7 @@ class ReflectionClass extends \ReflectionClass
                 $ret = TRUE;
             }
         } catch (\ReflectionException $exception) {
-
+            //$ret remains FALSE
         }
         return $ret;
     }
@@ -80,6 +82,12 @@ class ReflectionClass extends \ReflectionClass
         return $ret;
     }
 
+    /**
+     * Checks does this class has own (not from a parent class) dynamic property
+     * @param string $name
+     * @return bool
+     * @throws \ReflectionException
+     */
     public function hasOwnDynamicProperty(string $name) : bool
     {
         $ret = FALSE;
@@ -92,6 +100,12 @@ class ReflectionClass extends \ReflectionClass
         return $ret;
     }
 
+    /**
+     * Checks does this class has own (not from a parent class) static property
+     * @param string $name
+     * @return bool
+     * @throws \ReflectionException
+     */
     public function hasOwnStaticProperty(string $name) : bool
     {
         $ret = FALSE;
@@ -104,6 +118,12 @@ class ReflectionClass extends \ReflectionClass
         return $ret;
     }
 
+    /**
+     * Checks does this class has own (not from a parent class) constant
+     * @param string $name
+     * @return bool
+     * @throws \ReflectionException
+     */
     public function hasOwnConstant(string $name) : bool
     {
         $ret = FALSE;
