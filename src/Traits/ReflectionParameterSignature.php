@@ -25,7 +25,7 @@ trait ReflectionParameterSignature
             if ($this->isDefaultValueConstant()) {
                 $ret .= ' = '.$this->getDefaultValueConstantName();
             } else {
-                $ret .= ' = '.$this->getDefaultValue();
+                $ret .= ' = '.var_export($this->getDefaultValue(), TRUE);
             }
         }
 

@@ -67,7 +67,7 @@ trait ReflectionClassStructure
 
             $ret .= '    '.implode(' ',$modifiers).' $'.$RProperty->name;
             if ($prop_value = $default_properties[$RProperty->name]) {
-                $ret .= ' = '.$prop_value;
+                $ret .= ' = '.var_export($prop_value, TRUE);
             }
             $ret .= ';'.PHP_EOL;
 
@@ -86,7 +86,7 @@ trait ReflectionClassStructure
         foreach ($this->getReflectionConstants() as $RConstant) {
             $modifiers = \Reflection::getModifierNames($RConstant->getModifiers());
             $ret .= '    '.implode(' ',$modifiers).' const '.$RConstant->name;
-            $ret .= ' = '.$constants[$RConstant->name];
+            $ret .= ' = '.var_export($constants[$RConstant->name], TRUE);
             $ret .= ';'.PHP_EOL;
         }
         return $ret;

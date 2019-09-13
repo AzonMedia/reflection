@@ -17,7 +17,13 @@ trait ReflectionFunctionSignature
         $ret = '';
         $param_arr = [];
         foreach ($this->getParameters() as $RParam) {
-            $RParam = new ReflectionParameter([$this->getDeclaringClass()->name, $this->name], $RParam->name);
+            try {
+                $RParam = new ReflectionParameter([$this->getDeclaringClass()->name, $this->name], $RParam->name);
+            } catch (\ReflectionException $Exception) {
+                //it may happen the function to be an alais to another one and ->name and ->getName() to return wrong name
+                continue;
+            }
+            
             $param_arr[] = $RParam->getSignature();
         }
 
