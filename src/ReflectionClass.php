@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Azonmedia\Reflection;
 
+use Azonmedia\Reflection\Traits\ReflectionClassStructure;
+
 /**
  * Class ReflectionClass
  * Contains additional methods to the ones provided in \ReflectionClass
@@ -12,6 +14,9 @@ namespace Azonmedia\Reflection;
  */
 class ReflectionClass extends \ReflectionClass
 {
+
+    use ReflectionClassStructure;
+
     /**
      * Returns an array of all parent classes
      * @return array
@@ -151,6 +156,5 @@ class ReflectionClass extends \ReflectionClass
         }
         return $ret;
     }
-
     
 }
