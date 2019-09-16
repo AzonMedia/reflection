@@ -27,7 +27,7 @@ trait ReflectionClassStructure
         if ($ParentRClass = $this->getParentClass()) {
             $ret .= ' extends \\'.$ParentRClass->name;
         }
-        if ($interfaces = $this->getInterfaceNames()) {
+        if ($interfaces = $this->getOwnInterfaceNames()) {
             array_walk($interfaces, function(&$value){ $value = '\\'.$value; });
             $ret .= ' implements '.implode(', ',$interfaces);
         }
@@ -63,13 +63,16 @@ trait ReflectionClassStructure
                 //it was defined at runtime - not part of the class definition
                 continue;
             }
-            $modifiers = \Reflection::getModifierNames($RProperty->getModifiers());
 
-            $ret .= '    '.implode(' ',$modifiers).' $'.$RProperty->name;
-            if ($prop_value = $default_properties[$RProperty->name]) {
-                $ret .= ' = '.var_export($prop_value, TRUE);
+            if ($RProperty->class === $this->name) {
+                $modifiers = \Reflection::getModifierNames($RProperty->getModifiers());
+
+                $ret .= '    '.implode(' ',$modifiers).' $'.$RProperty->name;
+                if ($prop_value = $default_properties[$RProperty->name]) {
+                    $ret .= ' = '.var_export($prop_value, TRUE);
+                }
+                $ret .= ';'.PHP_EOL;
             }
-            $ret .= ';'.PHP_EOL;
 
         }
         return $ret;
@@ -84,10 +87,12 @@ trait ReflectionClassStructure
         $ret = '';
         $constants = $this->getConstants();
         foreach ($this->getReflectionConstants() as $RConstant) {
-            $modifiers = \Reflection::getModifierNames($RConstant->getModifiers());
-            $ret .= '    '.implode(' ',$modifiers).' const '.$RConstant->name;
-            $ret .= ' = '.var_export($constants[$RConstant->name], TRUE);
-            $ret .= ';'.PHP_EOL;
+            if ($RConstant->class === $this->name) { //is it defined in this class or is coming form the parent
+                $modifiers = \Reflection::getModifierNames($RConstant->getModifiers());
+                $ret .= '    '.implode(' ',$modifiers).' const '.$RConstant->name;
+                $ret .= ' = '.var_export($constants[$RConstant->name], TRUE);
+                $ret .= ';'.PHP_EOL;
+            }
         }
         return $ret;
     }
@@ -102,8 +107,10 @@ trait ReflectionClassStructure
 
         $ret = '';
         foreach ($this->getMethods() as $RMethod) {
-            $RMethod = new ReflectionMethod($this->name, $RMethod->name);
-            $ret .= $RMethod->getSignature().PHP_EOL;
+            if ($RMethod->class === $this->name) { //is it defined in this class or is coming form the parent
+                $RMethod = new ReflectionMethod($this->name, $RMethod->name);
+                $ret .= $RMethod->getSignature().PHP_EOL;
+            }
         }
 
         return $ret;

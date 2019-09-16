@@ -156,5 +156,43 @@ class ReflectionClass extends \ReflectionClass
         }
         return $ret;
     }
-    
+
+    /**
+     * Returns only the interfaces implemented by this class, excluding the interfaces implemented by the parent class
+     * or any interfaces extended by the already implemented interfaces by this class.
+     * Returns and indexed array of strings (interface names).
+     * @return array
+     */
+    public function getOwnInterfaceNames() : array
+    {
+        $ret = [];
+        $interfaces_names = $this->getInterfaceNames();
+        $RParentClass = $this->getParentClass();
+        if ($RParentClass) {
+            $parent_class_interfaces_names = $RParentClass->getInterfaceNames();
+            $interfaces_names = array_diff($interfaces_names, $parent_class_interfaces_names);
+        }
+        //then make sure the implemented interfaces are not due to an interface implementing another one
+        $parent_interfaces_names = [];
+        foreach ($interfaces_names as $interfaces_name) {
+            $RInterface = new $this($interfaces_name);
+            $parent_interfaces_names = array_merge($parent_interfaces_names, $RInterface->getInterfaceNames());
+        }
+        return array_diff($interfaces_names, $parent_interfaces_names);
+    }
+
+    /**
+     * Returns only the interfaces implemented by this class, excluding the interfaces implemented by the parent class
+     * or any interfaces extended by the already implemented interfaces by this class.
+     * Returns and indexed array of ReflectionClass
+     * @return array
+     */
+    public function getOwnInterfaces() : array
+    {
+        $ret = [];
+        foreach ($this->getOwnInterfaceNames() as $interface_name) {
+            $ret[] = new $this($interface_name);
+        }
+        return $ret;
+    }
 }
