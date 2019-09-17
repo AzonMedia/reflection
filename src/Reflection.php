@@ -12,6 +12,14 @@ namespace Azonmedia\Reflection;
 class Reflection extends \Reflection
 {
 
+    const SOURCE_INDENTATION = 4;
+
+    public static function indent(string $code, $indentations = 1)
+    {
+        $code = str_repeat(' ', self::SOURCE_INDENTATION * $indentations).$code;
+        $code = str_replace(PHP_EOL, PHP_EOL . str_repeat(' ', self::SOURCE_INDENTATION * $indentations) , $code );
+        return $code;
+    }
 
     /**
      * Returns a ReflectionFunction based on the provided callable.

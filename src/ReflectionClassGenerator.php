@@ -13,6 +13,25 @@ class ReflectionClassGenerator extends ReflectionClass
 
     protected $gen_name;
 
+    protected $gen_doc_comment;
+
+    /**
+     * @param string $doc_comment
+     */
+    public function setDocComment(string $doc_comment) : void
+    {
+        $this->gen_doc_comment = $doc_comment;
+    }
+
+    public function getDocComment()
+    {
+        $ret = parent::getDocComment();
+        if ($this->gen_doc_comment) {
+            $ret = $this->gen_doc_comment;
+        }
+        return $ret;
+    }
+
     /**
      * Allows for the class name change.
      * @param string $name
@@ -22,34 +41,33 @@ class ReflectionClassGenerator extends ReflectionClass
         //since the $this->name property is a read only and can not be changed even with reflectio na new property needs to be used
         //TODO add validation
         $this->gen_name = $name;
-
     }
 
     public function getShortName() : string
     {
+        $ret = parent::getShortName();
         if ($this->gen_name) {
-            return substr($this->gen_name, strrpos($this->gen_name,'\\') + 1);
-        } else {
-            return parent::getShortName();
+            $ret = substr($this->gen_name, strrpos($this->gen_name,'\\') + 1);
         }
+        return $ret;
     }
 
     public function getName() : string
     {
+        $ret = parent::getName();
         if ($this->gen_name) {
-            return $this->gen_name;
-        } else {
-            return parent::getName();
+            $ret = $this->gen_name;
         }
+        return $ret;
     }
 
     public function getNamespaceName() : string
     {
+        $ret = parent::getNamespaceName();
         if ($this->gen_name) {
-            return substr($this->gen_name, 0 , strrpos($this->gen_name,'\\'));
-        } else {
-            return parent::getNamespaceName();
+            $ret = substr($this->gen_name, 0 , strrpos($this->gen_name,'\\'));
         }
+        return $ret;
     }
 
 }

@@ -20,7 +20,7 @@ trait ReflectionParameterSignature
         if ($this->isPassedByReference()) {
             $ret .= '&';
         }
-        $ret .= '$'.$this->name;
+        $ret .= '$'.$this->getName();
         if ($this->isDefaultValueAvailable()) {
             if ($this->isDefaultValueConstant()) {
                 $ret .= ' = '.$this->getDefaultValueConstantName();
@@ -29,6 +29,19 @@ trait ReflectionParameterSignature
             }
         }
 
+        return $ret;
+    }
+
+    public function generateDocComment() : string
+    {
+        $ret = '';
+        $ret .= '@param ';
+        if ($RType = $this->getType()) {
+            $ret .= ($RType->allowsNull() ? 'null|' : '').($RType->isBuiltin() ? '' : '\\').$RType.' ';
+        } else {
+            $ret .= 'type ';
+        }
+        $ret .= $this->getName();
         return $ret;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Azonmedia\Reflection\Traits;
 
+use Azonmedia\Reflection\Reflection;
 use Azonmedia\Reflection\ReflectionMethod;
 
 trait ReflectionClassStructure
@@ -10,7 +11,7 @@ trait ReflectionClassStructure
      * Returns the full structure of the class as string.
      * @return string
      */
-    public function getClassStructure() : string
+    public function getClassStructure(bool $with_generated_doc_block = FALSE) : string
     {
         $ret = '<?php'.PHP_EOL;
 
@@ -18,6 +19,13 @@ trait ReflectionClassStructure
         if ($namespace) {
             $ret .= 'namespace '.$namespace.';'.PHP_EOL;
         }
+
+        if ($with_generated_doc_block) {
+            $ret .= $this->getOrGenerateDocComment().PHP_EOL;
+        } else {
+            $ret .= $this->getDocComment().PHP_EOL;
+        }
+
 
         $modifiers = \Reflection::getModifierNames($this->getModifiers());
         if ($modifiers) {
@@ -37,12 +45,20 @@ trait ReflectionClassStructure
 
         if ($traits = $this->getTraitNames()) {
             array_walk($traits, function(&$value){ $value = '\\'.$value; });
-            $ret .= ' use '.implode(', ',$traits).';';
+            $ret .= ' use '.implode(', ',$traits).';'.PHP_EOL;
+            $ret .= PHP_EOL;
         }
 
-        $ret .= $this->getPropertiesDeclaration();
-        $ret .= $this->getConstantsDeclaration();
-        $ret .= $this->getMethodsDeclaration();
+
+        $ret .= $this->getPropertiesDeclaration(0, $with_generated_doc_block);
+
+        $ret .= PHP_EOL;
+
+        $ret .= $this->getConstantsDeclaration($with_generated_doc_block);
+
+        $ret .= PHP_EOL;
+
+        $ret .= $this->getMethodsDeclaration($with_generated_doc_block);
 
         $ret .= '}'.PHP_EOL;
 
@@ -54,7 +70,7 @@ trait ReflectionClassStructure
      * @param int $filter
      * @return string
      */
-    public function getPropertiesDeclaration(int $filter = 0) : string
+    public function getPropertiesDeclaration(int $filter = 0, bool $with_generated_doc_block = FALSE) : string
     {
         $ret = '';
         $default_properties = $this->getDefaultProperties();
@@ -67,14 +83,32 @@ trait ReflectionClassStructure
             if ($RProperty->class === $this->name) {
                 $modifiers = \Reflection::getModifierNames($RProperty->getModifiers());
 
-                $ret .= '    '.implode(' ',$modifiers).' $'.$RProperty->name;
-                if ($prop_value = $default_properties[$RProperty->name]) {
+                $prop_value = $default_properties[$RProperty->name];
+
+                $doc_comment = $RProperty->getDocComment();
+
+                if (!$doc_comment && $with_generated_doc_block) {
+                    $prop_type = '';
+                    if ($prop_value) {
+                        $prop_type = gettype($prop_value);
+                    }
+                    $doc_comment = <<<COMMENT
+/**
+ * @var $prop_type
+ */
+COMMENT;
+                }
+                $ret .= $doc_comment.PHP_EOL;
+
+                $ret .= implode(' ',$modifiers).' $'.$RProperty->name;
+                if ($prop_value) {
                     $ret .= ' = '.var_export($prop_value, TRUE);
                 }
-                $ret .= ';'.PHP_EOL;
+                $ret .= ';'.PHP_EOL.PHP_EOL;
             }
 
         }
+        $ret = Reflection::indent($ret);
         return $ret;
     }
 
@@ -82,18 +116,32 @@ trait ReflectionClassStructure
      * Returns a multiline string with all constants declarations.
      * @return string
      */
-    public function getConstantsDeclaration() : string
+    public function getConstantsDeclaration(bool $with_generated_doc_block = FALSE) : string
     {
         $ret = '';
         $constants = $this->getConstants();
         foreach ($this->getReflectionConstants() as $RConstant) {
             if ($RConstant->class === $this->name) { //is it defined in this class or is coming form the parent
+
+                $doc_comment = $RConstant->getDocComment();
+
+                if (!$doc_comment && $with_generated_doc_block) {
+                    $const_type = gettype($constants[$RConstant->name]);
+                    $doc_comment = <<<COMMENT
+/**
+ * @var $const_type
+ */
+COMMENT;
+                }
+                $ret .= $doc_comment.PHP_EOL;
+
                 $modifiers = \Reflection::getModifierNames($RConstant->getModifiers());
-                $ret .= '    '.implode(' ',$modifiers).' const '.$RConstant->name;
+                $ret .= implode(' ',$modifiers).' const '.$RConstant->name;
                 $ret .= ' = '.var_export($constants[$RConstant->name], TRUE);
-                $ret .= ';'.PHP_EOL;
+                $ret .= ';'.PHP_EOL.PHP_EOL;
             }
         }
+        $ret = Reflection::indent($ret);
         return $ret;
     }
 
@@ -102,17 +150,34 @@ trait ReflectionClassStructure
      * @return string
      * @throws \ReflectionException
      */
-    public function getMethodsDeclaration() : string
+    public function getMethodsDeclaration(bool $with_generated_doc_block = FALSE) : string
     {
 
         $ret = '';
         foreach ($this->getMethods() as $RMethod) {
             if ($RMethod->class === $this->name) { //is it defined in this class or is coming form the parent
                 $RMethod = new ReflectionMethod($this->name, $RMethod->name);
-                $ret .= $RMethod->getSignature().PHP_EOL;
+                $ret .= $RMethod->getSignature($with_generated_doc_block).PHP_EOL;
             }
         }
 
+        return $ret;
+    }
+    
+    public function getOrGenerateDocComment() : string
+    {
+        $ret = $this->getDocComment();
+        if (!$ret) {
+            $class_name = $this->getShortName();
+            $class_ns = $this->getNamespaceName();
+            $ret = <<<COMMENT
+/**
+ * Class $class_name
+ * @package $class_ns
+ */
+COMMENT;
+
+        }
         return $ret;
     }
 
