@@ -22,6 +22,7 @@ trait ReflectionFunctionSignature
                 $RParam = new ReflectionParameter([$this->getDeclaringClass()->getName(), $this->getName()], $RParam->getName());
             } catch (\ReflectionException $Exception) {
                 //it may happen the function to be an alais to another one and ->name and ->getName() to return wrong name
+                print get_class($Exception).': '.$Exception->getMessage().' in '.$Exception->getFile().'#'.$Exception->getLine().PHP_EOL;
                 continue;
             }
             
@@ -40,8 +41,8 @@ trait ReflectionFunctionSignature
         $modifiers = \Reflection::getModifierNames($this->getModifiers());
 
         $ret = '';
-        $doc_block = $this->getDocComment();
-        if (!$doc_block && $with_generated_doc_block) {
+        $doc_comment = $this->getDocComment();
+        if (!$doc_comment && $with_generated_doc_block) {
 
             $args_doc_arr = [];
             foreach ($this->getParameters() as $RParam) {

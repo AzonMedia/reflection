@@ -13,11 +13,11 @@ trait ReflectionClassStructure
      */
     public function getClassStructure(bool $with_generated_doc_block = FALSE) : string
     {
-        $ret = '<?php'.PHP_EOL;
+        $ret = '<?php'.PHP_EOL.PHP_EOL;
 
         $namespace = $this->getNamespaceName();
         if ($namespace) {
-            $ret .= 'namespace '.$namespace.';'.PHP_EOL;
+            $ret .= 'namespace '.$namespace.';'.PHP_EOL.PHP_EOL;
         }
 
         if ($with_generated_doc_block) {

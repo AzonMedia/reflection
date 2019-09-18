@@ -16,6 +16,9 @@ trait ReflectionParameterSignature
         $ret = '';
         if ($RType = $this->getType()) {
             $ret .= ($RType->allowsNull() ? '?' : '').($RType->isBuiltin() ? '' : '\\').$RType.' ';
+            if ($this->isVariadic()) {
+                $ret .= '...';
+            }
         }
         if ($this->isPassedByReference()) {
             $ret .= '&';
@@ -38,10 +41,23 @@ trait ReflectionParameterSignature
         $ret .= '@param ';
         if ($RType = $this->getType()) {
             $ret .= ($RType->allowsNull() ? 'null|' : '').($RType->isBuiltin() ? '' : '\\').$RType.' ';
+            if ($this->isPassedByReference()) {
+                $ret .= '&';
+            }
+            if ($this->isVariadic()) {
+                $ret .= '...';
+            }
         } else {
-            $ret .= 'type ';
+            if ($this->isPassedByReference()) {
+                $ret .= '&';
+            }
+            if ($this->isVariadic()) {
+                $ret .= '...';
+            } else {
+                $ret .= 'type ';
+            }
         }
-        $ret .= $this->getName();
+        $ret .= '$'.$this->getName();
         return $ret;
     }
 }
