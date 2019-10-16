@@ -38,7 +38,11 @@ trait ReflectionFunctionSignature
      */
     public function getSignature(bool $with_generated_doc_block = FALSE) : string
     {
-        $modifiers = \Reflection::getModifierNames($this->getModifiers());
+        if ($this instanceof \ReflectionMethod) {
+            $modifiers = \Reflection::getModifierNames($this->getModifiers());
+        } else {
+            $modifiers = '';
+        }
 
         $ret = '';
         $doc_comment = $this->getDocComment();
@@ -52,7 +56,12 @@ trait ReflectionFunctionSignature
             $args_doc_str = implode(PHP_EOL.' * ', $args_doc_arr);
             $ret_doc_str = '';
             if ($RType = $this->getReturnType()) {
-                $ret_doc_str .= '@return '.($RType->allowsNull() ? 'null|' : '').($RType->isBuiltin() ? '' : '\\').$RType;
+                $rtype_string = (string) $RType;
+                if (in_array($rtype_string, ['self', 'parent', 'static'])) {
+                    $ret_doc_str .= '@return '.($RType->allowsNull() ? 'null|' : '').($RType->isBuiltin() ? '' : '').$RType;
+                } else {
+                    $ret_doc_str .= '@return '.($RType->allowsNull() ? 'null|' : '').($RType->isBuiltin() ? '' : '\\').$RType;
+                }
             } else {
                 $ret_doc_str .= '@return void';
             }
