@@ -81,7 +81,12 @@ trait ReflectionFunctionSignature
 COMMENT;
         }
         $ret .= $doc_comment.PHP_EOL;
-        $ret .= implode(' ',$modifiers).' function ';
+        if ($modifiers) {
+            $ret .= implode(' ', $modifiers).' function ';
+        } else {
+            $ret .= 'function ';
+        }
+
         if ($this->returnsReference()) {
             $ret .= '&';
         }
