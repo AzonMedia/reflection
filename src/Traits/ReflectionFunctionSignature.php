@@ -98,7 +98,9 @@ COMMENT;
 
         $ret .= ' { }'.PHP_EOL;
 
-        $ret = Reflection::indent($ret);
+        if ($this instanceof \ReflectionMethod) {
+            $ret = Reflection::indent($ret);
+        }
 
         return $ret;
     }
