@@ -50,7 +50,11 @@ trait ReflectionFunctionSignature
 
             $args_doc_arr = [];
             foreach ($this->getParameters() as $RParam) {
-                $RParam = new ReflectionParameter([$this->getDeclaringClass()->getName(), $this->getName()], $RParam->getName());
+                if ($this instanceof \ReflectionMethod) {
+                    $RParam = new ReflectionParameter([$this->getDeclaringClass()->getName(), $this->getName()], $RParam->getName());
+                } else {
+                    $RParam = new ReflectionParameter($this->getName(), $RParam->getName());
+                }
                 $args_doc_arr[] = $RParam->generateDocComment();
             }
             $args_doc_str = implode(PHP_EOL.' * ', $args_doc_arr);
