@@ -15,7 +15,9 @@ trait ReflectionParameterSignature
     {
         $ret = '';
         if ($RType = $this->getType()) {
-            $ret .= ($RType->allowsNull() ? '?' : '').($RType->isBuiltin() ? '' : '\\').$RType.' ';
+
+            //$ret .= ($RType->allowsNull() ? '?' : '').($RType->isBuiltin() ? '' : '\\').$RType.' ';
+            $ret .= ($RType->allowsNull() ? '?' : '').($RType->isBuiltin() ? '' : '\\').$RType->getName().' ';
             if ($this->isVariadic()) {
                 $ret .= '...';
             }

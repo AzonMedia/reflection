@@ -93,7 +93,8 @@ COMMENT;
         $ret .= $this->name.'( '.$this->getParametersList().')';
 
         if ($RType = $this->getReturnType()) {
-            $ret .= ' : '.($RType->allowsNull() ? '?' : '').($RType->isBuiltin() ? '' : '\\').$RType;
+            //$ret .= ' : '.($RType->allowsNull() ? '?' : '').($RType->isBuiltin() ? '' : '\\').$RType;
+            $ret .= ' : '.($RType->allowsNull() ? '?' : '').($RType->isBuiltin() ? '' : '\\').$RType->getName();
         }
 
         $ret .= ' { }'.PHP_EOL;
