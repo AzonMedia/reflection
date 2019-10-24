@@ -195,4 +195,31 @@ class ReflectionClass extends \ReflectionClass
         }
         return $ret;
     }
+
+    /**
+     * Returns an array of strings containing class constants that match the provided value
+     * @param $constant_value
+     * @return array
+     */
+    public function getClassConstantsByValue(/* mixed */ $constant_value ) : array
+    {
+        $ret = [];
+        $constants = self::getConstants();
+        foreach ($constants as $const_name=>$const_value) {
+            if ($constant_value === $const_value) {
+                $ret[] = $const_name;
+            }
+        }
+        return $ret;
+    }
+
+    public function getReverseConstantsList() : array
+    {
+        $ret = [];//contains a revers array of constant value => constant name, duplicates are skipped (meaning two constants with the same value)
+        foreach (self::getConstants() as $const_name=>$const_value) {
+            if (!array_key_exists($const_value, $ret)) {
+                $ret[$const_value] = $const_name;
+            }
+        }
+    }
 }
