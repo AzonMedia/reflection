@@ -106,7 +106,7 @@ class ReflectionClass extends \ReflectionClass
     }
 
     /**
-     * Returns an array of ReflectionProperties of the dynamic properties that are defined in this class only excluding the ones defined in the parent.
+     * Returns an array of ReflectionProperty of the dynamic properties that are defined in this class only excluding the ones defined in the parent.
      * @return array
      */
     public function getOwnDynamicProperties() : array
@@ -115,6 +115,22 @@ class ReflectionClass extends \ReflectionClass
         $properties = $this->getProperties();
         foreach ($properties as $RProperty) {
             if (!$RProperty->isStatic() && $RProperty->class === $this->name) {
+                $ret[] = $RProperty;
+            }
+        }
+        return $ret;
+    }
+
+    /**
+     * Returns an array of ReflectionProperty of the static properties that are defined in this class only excluding the ones defined in the parent.
+     * @return array
+     */
+    public function getOwnStaticProperties() : array
+    {
+        $ret = [];
+        $properties = $this->getProperties();
+        foreach ($properties as $RProperty) {
+            if ($RProperty->isStatic() && $RProperty->class === $this->name) {
                 $ret[] = $RProperty;
             }
         }
