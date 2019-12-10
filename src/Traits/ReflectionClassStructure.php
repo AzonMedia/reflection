@@ -15,7 +15,6 @@ trait ReflectionClassStructure
     public function getClassStructure(bool $with_generated_doc_block = FALSE) : string
     {
         $ret = '<?php'.PHP_EOL.PHP_EOL;
-declare(strict_types=1);
 
         $namespace = $this->getNamespaceName();
         if ($namespace) {
