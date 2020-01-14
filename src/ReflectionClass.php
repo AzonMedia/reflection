@@ -66,7 +66,7 @@ class ReflectionClass extends \ReflectionClass
         $ret = FALSE;
         try {
             $Rmethod = $this->getMethod($method);
-            if ($Rmethod->name == $method && $Rmethod->class == $this->name) {
+            if ($Rmethod->name === $method && $Rmethod->getDeclaringClass()->name  === $this->name) {
                 $ret = TRUE;
             }
         } catch (\ReflectionException $exception) {
@@ -98,7 +98,7 @@ class ReflectionClass extends \ReflectionClass
         $ret = FALSE;
         if ($this->hasProperty($name)) {
             $RProperty = $this->getProperty($name);
-            if (!$RProperty->isStatic() && $RProperty->class === $this->name) {
+            if (!$RProperty->isStatic() && $RProperty->getDeclaringClass()->name  === $this->name) {
                 $ret = TRUE;
             }
         }
@@ -114,7 +114,7 @@ class ReflectionClass extends \ReflectionClass
         $ret = [];
         $properties = $this->getProperties();
         foreach ($properties as $RProperty) {
-            if (!$RProperty->isStatic() && $RProperty->class === $this->name) {
+            if (!$RProperty->isStatic() && $RProperty->getDeclaringClass()->name  === $this->name) {
                 $ret[] = $RProperty;
             }
         }
@@ -130,7 +130,7 @@ class ReflectionClass extends \ReflectionClass
         $ret = [];
         $properties = $this->getProperties();
         foreach ($properties as $RProperty) {
-            if ($RProperty->isStatic() && $RProperty->class === $this->name) {
+            if ($RProperty->isStatic() && $RProperty->getDeclaringClass()->name  === $this->name) {
                 $ret[] = $RProperty;
             }
         }
@@ -148,7 +148,7 @@ class ReflectionClass extends \ReflectionClass
         $ret = FALSE;
         if ($this->hasProperty($name)) {
             $RProperty = $this->getProperty($name);
-            if ($RProperty->isStatic() && $RProperty->class === $this->name) {
+            if ($RProperty->isStatic() && $RProperty->getDeclaringClass()->name  === $this->name) {
                 $ret = TRUE;
             }
         }
@@ -166,7 +166,7 @@ class ReflectionClass extends \ReflectionClass
         $ret = FALSE;
         if ($this->hasConstant($name)) {
             $RClassConstant = new \ReflectionClassConstant($this->name, $name);
-            if ($RClassConstant->class === $this->name) {
+            if ($RClassConstant->getDeclaringClass()->name === $this->name) {
                 $ret = TRUE;
             }
         }
