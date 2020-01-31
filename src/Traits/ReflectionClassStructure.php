@@ -12,7 +12,7 @@ trait ReflectionClassStructure
      * Returns the full structure of the class as string.
      * @return string
      */
-    public function getClassStructure(bool $with_generated_doc_block = FALSE) : string
+    public function getClassStructure(bool $with_generated_doc_block = FALSE, bool $no_doc_block = FALSE) : string
     {
         $ret = '<?php'.PHP_EOL.PHP_EOL;
 
@@ -21,10 +21,12 @@ trait ReflectionClassStructure
             $ret .= 'namespace '.$namespace.';'.PHP_EOL.PHP_EOL;
         }
 
-        if ($with_generated_doc_block) {
-            $ret .= $this->getOrGenerateDocComment().PHP_EOL;
-        } else {
-            $ret .= $this->getDocComment().PHP_EOL;
+        if (!$no_doc_block) {
+            if ($with_generated_doc_block) {
+                $ret .= $this->getOrGenerateDocComment() . PHP_EOL;
+            } else {
+                $ret .= $this->getDocComment() . PHP_EOL;
+            }
         }
 
 
@@ -51,15 +53,15 @@ trait ReflectionClassStructure
         }
 
 
-        $ret .= $this->getPropertiesDeclaration(0, $with_generated_doc_block);
+        $ret .= $this->getPropertiesDeclaration(0, $with_generated_doc_block, $no_doc_block);
 
         $ret .= PHP_EOL;
 
-        $ret .= $this->getConstantsDeclaration($with_generated_doc_block);
+        $ret .= $this->getConstantsDeclaration($with_generated_doc_block, $no_doc_block);
 
         $ret .= PHP_EOL;
 
-        $ret .= $this->getMethodsDeclaration($with_generated_doc_block);
+        $ret .= $this->getMethodsDeclaration($with_generated_doc_block, $no_doc_block);
 
         $ret .= '}'.PHP_EOL;
 
@@ -71,7 +73,7 @@ trait ReflectionClassStructure
      * @param int $filter
      * @return string
      */
-    public function getPropertiesDeclaration(int $filter = 0, bool $with_generated_doc_block = FALSE) : string
+    public function getPropertiesDeclaration(int $filter = 0, bool $with_generated_doc_block = FALSE, bool $no_doc_block = FALSE) : string
     {
         $ret = '';
         $default_properties = $this->getDefaultProperties();
@@ -86,20 +88,21 @@ trait ReflectionClassStructure
 
                 $prop_value = $default_properties[$RProperty->name];
 
-                $doc_comment = $RProperty->getDocComment();
-
-                if (!$doc_comment && $with_generated_doc_block) {
-                    $prop_type = '';
-                    if ($prop_value) {
-                        $prop_type = gettype($prop_value);
-                    }
-                    $doc_comment = <<<COMMENT
+                if (!$$no_doc_block) {
+                    $doc_comment = $RProperty->getDocComment();
+                    if (!$doc_comment && $with_generated_doc_block) {
+                        $prop_type = '';
+                        if ($prop_value) {
+                            $prop_type = gettype($prop_value);
+                        }
+                        $doc_comment = <<<COMMENT
 /**
  * @var $prop_type
  */
 COMMENT;
+                    }
+                    $ret .= $doc_comment . PHP_EOL;
                 }
-                $ret .= $doc_comment.PHP_EOL;
 
                 $ret .= implode(' ',$modifiers).' $'.$RProperty->name;
                 if ($prop_value) {
@@ -117,24 +120,26 @@ COMMENT;
      * Returns a multiline string with all constants declarations.
      * @return string
      */
-    public function getConstantsDeclaration(bool $with_generated_doc_block = FALSE) : string
+    public function getConstantsDeclaration(bool $with_generated_doc_block = FALSE, bool $no_doc_block = FALSE) : string
     {
         $ret = '';
         $constants = $this->getConstants();
         foreach ($this->getReflectionConstants() as $RConstant) {
             if ($RConstant->class === $this->name) { //is it defined in this class or is coming form the parent
 
-                $doc_comment = $RConstant->getDocComment();
+                if (!$no_doc_block) {
+                    $doc_comment = $RConstant->getDocComment();
 
-                if (!$doc_comment && $with_generated_doc_block) {
-                    $const_type = gettype($constants[$RConstant->name]);
-                    $doc_comment = <<<COMMENT
+                    if (!$doc_comment && $with_generated_doc_block) {
+                        $const_type = gettype($constants[$RConstant->name]);
+                        $doc_comment = <<<COMMENT
 /**
  * @var $const_type
  */
 COMMENT;
+                    }
+                    $ret .= $doc_comment.PHP_EOL;
                 }
-                $ret .= $doc_comment.PHP_EOL;
 
                 $modifiers = \Reflection::getModifierNames($RConstant->getModifiers());
                 $ret .= implode(' ',$modifiers).' const '.$RConstant->name;
@@ -151,14 +156,14 @@ COMMENT;
      * @return string
      * @throws \ReflectionException
      */
-    public function getMethodsDeclaration(bool $with_generated_doc_block = FALSE) : string
+    public function getMethodsDeclaration(bool $with_generated_doc_block = FALSE, bool $no_doc_block = FALSE) : string
     {
 
         $ret = '';
         foreach ($this->getMethods() as $RMethod) {
             if ($RMethod->class === $this->name) { //is it defined in this class or is coming form the parent
                 $RMethod = new ReflectionMethod($this->name, $RMethod->name);
-                $ret .= $RMethod->getSignature($with_generated_doc_block).PHP_EOL;
+                $ret .= $RMethod->getSignature($with_generated_doc_block, $no_doc_block).PHP_EOL;
             }
         }
 

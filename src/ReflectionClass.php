@@ -174,6 +174,23 @@ class ReflectionClass extends \ReflectionClass
     }
 
     /**
+     * Returns an array with ReflectionMethod that are declared in this class.
+     * @param int|null $filter
+     * @return array
+     */
+    public function getOwnMethods(?int $filter = NULL) : array
+    {
+        $ret = [];
+        $methods = $this->getMethods($filter);
+        foreach ($methods as $RMethod) {
+            if ($RMethod->getDeclaringClass()->name === $this->name) {
+                $ret[] = $RMethod;
+            }
+        }
+        return $ret;
+    }
+
+    /**
      * Returns only the interfaces implemented by this class, excluding the interfaces implemented by the parent class
      * or any interfaces extended by the already implemented interfaces by this class.
      * Returns and indexed array of strings (interface names).
