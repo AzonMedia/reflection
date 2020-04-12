@@ -41,6 +41,7 @@ class Reflection extends \Reflection
      * @param callable $callable
      * @return \ReflectionFunctionAbstract
      *
+     * @throws \ReflectionException
      * @author vesko@azonmedia.com
      * @created 5.10.2019
      */

@@ -10,4 +10,5 @@ use Azonmedia\Reflection\Traits\ReflectionFunctionSignature;
 class ReflectionFunction extends \ReflectionFunction
 {
     use ReflectionFunctionSignature;
+    use Traits\ReflectionFunction;
 }

@@ -10,6 +10,8 @@ use Azonmedia\Reflection\ReflectionParameter;
 
 trait ReflectionFunctionSignature
 {
+
+
     /**
      * Returns the argument list as a string comprised of the signatures for each parameter.
      * The returned string is like "int $param1, string $param2 = 'asd'"
@@ -40,7 +42,10 @@ trait ReflectionFunctionSignature
 
     /**
      * Returns the full method/function signature.
+     * @param bool $with_generated_doc_block
+     * @param bool $no_doc_block
      * @return string
+     * @throws \ReflectionException
      */
     public function getSignature(bool $with_generated_doc_block = FALSE, bool $no_doc_block = FALSE) : string
     {

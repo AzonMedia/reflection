@@ -88,7 +88,7 @@ trait ReflectionClassStructure
 
                 $prop_value = $default_properties[$RProperty->name];
 
-                if (!$$no_doc_block) {
+                if (!$no_doc_block) {
                     $doc_comment = $RProperty->getDocComment();
                     if (!$doc_comment && $with_generated_doc_block) {
                         $prop_type = '';
