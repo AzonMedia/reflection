@@ -18,7 +18,7 @@ trait ReflectionFunction
         /** @var \ReflectionParameter[] $parameters */
         $parameters = $this->getParameters();
         if (count($args) !== count($parameters)) {
-            throw new \InvalidArgumentException(sprintf('The provided number of arguments is %1s while the expected number is %2f.', count($args), count($parameters) ));
+            throw new \InvalidArgumentException(sprintf('The provided number of arguments is %1$s while the expected number is %2f.', count($args), count($parameters) ));
         }
         $aa = 0;
         foreach ($args as $arg) {
