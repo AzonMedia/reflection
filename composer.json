@@ -4,7 +4,7 @@
     "description": "Classes extending various PHP/Reflection classes",
     "keywords": ["utility","reflection"],
     "homepage": "https://github.com/AzonMedia/reflection",
-    "license": "BSD-3-Clause",
+    "license": "MIT",
     "authors": [
         {
             "name": "Vesko Kenashkov",
