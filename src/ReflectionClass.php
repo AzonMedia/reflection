@@ -107,7 +107,7 @@ class ReflectionClass extends \ReflectionClass
 
     /**
      * Returns an array of ReflectionProperty of the dynamic properties that are defined in this class only excluding the ones defined in the parent.
-     * @return array
+     * @return \ReflectionProperty[]
      */
     public function getOwnDynamicProperties(?int $filter = NULL) : array
     {
@@ -118,6 +118,41 @@ class ReflectionClass extends \ReflectionClass
                 $ret[] = $RProperty;
             }
         }
+        return $ret;
+    }
+
+    /**
+     * Returns all dynamic properties as per $filter from this class and its parents until reaching a parent class with name $until_parent_class_name (does not include properties from this class)
+     * @param int|null $filter
+     * @param string $until_parent_class_name
+     * @return array
+     */
+    public function getDynamicPropertiesUpToParentClass(?int $filter = null, string $until_parent_class_name = ''): array
+    {
+        /** @var \ReflectionProperty[] $ret */
+        $ret = [];
+        $class = $this->getName();
+        do {
+            $RClass = new static($class);
+            //$ret = [...$ret, ...$RClass->getOwnDynamicProperties($filter)];//if there are overriden these must be skipped (for example the defaultvalue may be different)
+            foreach ($RClass->getOwnDynamicProperties($filter) as $RProperty) {
+                foreach ($ret as $ExistingRProperty) {
+                    if ($RProperty->getName() === $ExistingRProperty->getName()) {
+                        continue 2;
+                    }
+                }
+                $ret[] = $RProperty;
+            }
+            $RParentClass = $RClass->getParentClass();
+            if ($RParentClass) {
+                $class = $RParentClass->getName();
+            } else {
+                $class = null;
+            }
+            if ($class === $until_parent_class_name) {
+                break;
+            }
+        } while ($class);
         return $ret;
     }
 
