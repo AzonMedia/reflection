@@ -18,15 +18,25 @@ class ReflectionClass extends \ReflectionClass
     use ReflectionClassStructure;
 
     /**
-     * Returns an array of all parent classes
-     * @return array
+     * Returns an array of class names.
+     * If the optional $up_to_parent_class is provided it will stop at this class (or interface).
+     * @param string|null $up_to_parent_class
+     * @return string[]
      */
-    public function getParentClasses() : array
+    public function getParentClasses(?string $up_to_parent_class = null) : array
     {
+
+        if ($up_to_parent_class && !class_exists($up_to_parent_class) && !interface_exists($up_to_parent_class)) {
+            throw new \InvalidArgumentException(sprintf('The provided up_to_parent_class %1$s is not a class or interface.'));
+        }
+
         $stack = array();
-        $parent_class = $this;
-        while ($parent_class = $parent_class->getParentClass()) {
-            $stack[] = $parent_class->name;
+        $ParentClass = $this;
+        while ($ParentClass = $ParentClass->getParentClass()) {
+            if ($up_to_parent_class && is_a($ParentClass->getName(), $up_to_parent_class, true)) {
+                break;
+            }
+            $stack[] = $ParentClass->getName();
         }
         return $stack;
     }
