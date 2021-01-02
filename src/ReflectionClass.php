@@ -33,7 +33,7 @@ class ReflectionClass extends \ReflectionClass
         $stack = array();
         $ParentClass = $this;
         while ($ParentClass = $ParentClass->getParentClass()) {
-            if ($up_to_parent_class && is_a($ParentClass->getName(), $up_to_parent_class, true)) {
+            if ($up_to_parent_class && $ParentClass->getName() === $up_to_parent_class) {
                 break;
             }
             $stack[] = $ParentClass->getName();
